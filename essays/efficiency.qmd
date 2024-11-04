@@ -15,3 +15,26 @@ As we’ve said in the class efficiency is a pivotal component of statistical co
 -   Why is efficiency important?
 
 -   Where did you encounter efficiency, and what were some [“a-ha” moments](https://www.merriam-webster.com/dictionary/aha%20moment) you had about efficiency? (For the latter, tie each a-ha moment to an artifact in the portfolio.)
+
+Efficiency in statistical computing and data sicience means making the best use of time and memory. In data science, this involves writing straight-to-the-point code that runs quickly. Efficient code helps with handling larger datasets and making the code faster. This is important to improve productivity. I had an a-ha moment when I was using the same function multiple times and realized that I could use a pipeline to make my code more efficient. This happened in this code:
+
+```{r}
+teacher_evals_clean <- teacher_evals |>
+  rename(sex = gender) |>
+  filter(no_participants >= 10) |>
+  mutate(across(c(course_id, 
+                  question_no, 
+                  academic_degree, 
+                  seniority, 
+                  sex,), as.factor)) |>
+  select(course_id, 
+         teacher_id, 
+         question_no, 
+         no_participants, 
+         resp_share, 
+         SET_score_avg, 
+         percent_failed_cur, 
+         academic_degree, 
+         seniority, 
+         sex)
+```

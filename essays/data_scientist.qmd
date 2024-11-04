@@ -9,3 +9,23 @@ editor: visual
 -   Focus specifically on data science concepts and the skills we employed in learning them, not a laundry list of topics that you learned (those are in the syllabus, so I know them already).
 
 -   Focus on a small number of specific areas of growth for you that happened in STAT 331. Identify at least one artifact in your portfolio that illustrates each area of growth and explain how this artifact shows growth in the way you are describing.
+
+This quarter in STAT 331, I significantly improved my data science skills, particularly in data cleaning, visualization, and efficient coding in R. I learned to handle data that needs to be filtered as demonstrated in this code:
+
+```{r}
+filtered_crime_scene_report <- crime_scene_report %>% filter(date == 20180115 & city == "SQL City" & type == "murder") print(filtered_crime_scene_report$description)
+```
+
+I also became better with **`ggplot`** to create clear visualizations as demonstrated in this code:
+
+```{r}
+ggplot(teacher_evals_compare, 
+       aes(x = sen_level, fill = SET_level)) + 
+       geom_bar(stat = "count", position = "stack") + 
+       labs( x = "Seniority of Instructor", 
+             y = "Number of Sections", 
+             fill = "SET Level", 
+             title = "Number of Sections" )
+```
+
+These improvements are reflected in my portfolio, showcasing my development as a data scientist.

@@ -8,10 +8,20 @@ editor: visual
 
 1.  Finish the sentence with another student’s name: "If \[Name of Student\] doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning.
 
+    If Skylar doesn’t earn an A, then nobody should, because they consistently demonstrated a strong grasp of R programming and were always willing to help others.
+
 2.  What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
+
+    The most difficult part of class for me has been the join functions because in the beginning, I did not really understand how to use them.
 
 3.  What was the easiest part of the class for you? Explain why.
 
+    The easiest part of the class for me has been formatting the code to make it more easily readable because now I know you have to space out the code.
+
 4.  What part of the class surprised or interested you the most? Explain why.
 
+    The most interesting part of class was learning about filtering data because now I can clean data for easier use.
+
 5.  Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
+
+    Stay organized and keep up with the assignments and attend lecture.
