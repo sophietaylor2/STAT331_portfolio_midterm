@@ -11,7 +11,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an B.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an A-.
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -19,33 +19,62 @@ execute:
 
 **WD-1: I can import data from a *variety* of formats (e.g., csv, xlsx, txt, etc.).**
 
--   `csv (Lab 4 Question 0)`
+-   `csv (Lab 7 Question 0)`
 
 ```{r}
 #| label: wd-1-csv
-childcare_costs <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-09/childcare_costs.csv')
+fish <- read_csv(
+  "/Users/sophietaylor/Documents/Week7/lab-7/data/BlackfootFish.csv")
 
 ```
 
--   `xlsx``(`Check-in 2.3: Importing Data Question 5)
+-   ``` xlsx``( ```Check-in 2.3: Importing Data Question 5)
 
 ```{r}
 #| label: wd-1-xlsx
-agesxl <- read_xlsx (path = here::here("check-ins", "2.1-loading-data", "Ages_Data", "ages.xlsx"), sheet = "ages")
+agesxl <- read_xlsx (path = 
+                       here::here(
+                         "check-ins", 
+                         "2.1-loading-data", 
+                         "Ages_Data", 
+                         "ages.xlsx"), 
+                     sheet = "ages")
 ```
 
 -   `txt (`Check-in 2.3: Importing Data Question 3)
 
 ```{r}
 #| label: wd-1-txt
-ages_tab <- read_table (file = here::here("Week 2", "Check-ins", "Ages_Data", "ages_tab.txt"))
+ages_tab <- read_table (file = 
+                          here::here(
+                            "Week 2", 
+                            "Check-ins", 
+                            "Ages_Data", 
+                            "ages_tab.txt"))
 ```
 
-**WD-2: I can select necessary columns from a dataset.**
+**WD-2: I can select necessary columns from a dataset.** (Lab 3 Question 5)
 
 ```{r}
 #| label: wd-2
-
+teacher_evals_clean <- teacher_evals |>
+  rename(sex = gender) |>
+  filter(no_participants >= 10) |>
+  mutate(across(c(course_id, 
+                  question_no, 
+                  academic_degree, 
+                  seniority, 
+                  sex,), as.factor)) |>
+  select(course_id, 
+         teacher_id, 
+         question_no, 
+         no_participants, 
+         resp_share, 
+         SET_score_avg, 
+         percent_failed_cur, 
+         academic_degree, 
+         seniority, 
+         sex)
 ```
 
 **WD-3: I can filter rows from a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -74,20 +103,30 @@ teacher_evals_clean <- teacher_evals |>
          sex)
 ```
 
--   character -- specifically a string (example must use functions from **stringr**) (Lab 5)
+-   character -- specifically a string (example must use functions from **stringr**) (Lab 3 Question 12 (Edited to use stringr))
 
 ```{r}
 #| label: wd-3-string
-filtered_crime_scene_report <- crime_scene_report %>%
-  filter(date == 20180115 & city == "SQL City" & type == "murder")
-print(filtered_crime_scene_report$description)
+average <- teacher_evals_clean |>
+  filter(str_detect(sex, "female"), 
+         str_detect(academic_degree, "dr|prof")) |>
+  group_by(teacher_id) |>
+  summarize(avg = mean(resp_share, na.rm = TRUE)) |>
+  arrange(avg)
+lowest <- average |> slice(1)
+highest <- average |> slice(n())
 ```
 
--   factor
+-   factor (Lab 5)
 
 ```{r}
 #| label: wd-3-factor
-
+filtered_crime_scene_report <- crime_scene_report %>%
+  filter(
+    date == 20180115 & 
+      city == "SQL City" & 
+      type == "murder")
+print(filtered_crime_scene_report$description)
 ```
 
 -   date (example must use functions from **lubridate**) (Lab 5)
@@ -95,7 +134,10 @@ print(filtered_crime_scene_report$description)
 ```{r}
 #| label: wd-3-date
 filtered_crime_scene_report <- crime_scene_report %>%
-  filter(date == 20180115 & city == "SQL City" & type == "murder")
+  filter(
+    date == 20180115 & 
+      city == "SQL City" & 
+      type == "murder")
 print(filtered_crime_scene_report$description)
 ```
 
@@ -121,53 +163,70 @@ teacher_evals_compare <- teacher_evals |>
 #| label: wd-4-string
 ca_childcare <- ca_childcare |> 
   mutate(county_name = str_remove(county_name, " County"))
-
-ca_childcare <- ca_childcare |> 
-  mutate(region = case_when(
-    county_name %in% c("Butte", "Colusa", "El Dorado", "Glenn", "Lassen", "Modoc", "Nevada", "Placer", "Plumas", "Sacramento", "Shasta", "Sierra", "Siskiyou", "Sutter", "Tehama", "Yolo", "Yuba") ~ "Superior California",
-    county_name %in% c("Del Norte", "Humboldt", "Lake", "Mendocino", "Napa", "Sonoma", "Trinity") ~ "North Coast",
-    county_name %in% c("Alameda", "Contra Costa", "Marin", "San Francisco", "San Mateo", "Santa Clara", "Solano") ~ "San Francisco Bay Area",
-    county_name %in% c("Alpine", "Amador", "Calaveras", "Madera", "Mariposa", "Merced", "Mono", "San Joaquin", "Stanislaus", "Tuolumne") ~ "San Joaquin Valley",
-    county_name %in% c("Monterey", "San Benito", "San Luis Obispo", "Santa Barbara", "Santa Cruz", "Ventura") ~ "Central Coast",
-    county_name %in% c("Fresno", "Inyo", "Kern", "Kings", "Tulare") ~ "Southern San Joaquin Valley",
-    county_name %in% c("Riverside", "San Bernardino") ~ "Inland Empire",
-    county_name == "Los Angeles" ~ "Los Angeles County",
-    county_name == "Orange" ~ "Orange County",
-    county_name %in% c("Imperial", "San Diego") ~ "San Diego - Imperial",
-    TRUE ~ NA_character_
-  ))
 ```
 
--   factor (example must use functions from **forcats**)
+-   factor (example must use functions from **forcats**) (Lab 4 Question 3 (Edited to use forcats))
 
 ```{r}
 #| label: wd-4-factor
-
+ca_childcare <- ca_childcare |> 
+  mutate(region = county_name |> 
+           fct_collapse(
+             `Superior California` = c("Butte", "Colusa", "El Dorado", "Glenn", "Lassen", "Modoc", 
+                                        "Nevada", "Placer", "Plumas", "Sacramento", "Shasta", 
+                                        "Sierra", "Siskiyou", "Sutter", "Tehama", "Yolo", "Yuba"),
+             `North Coast` = c("Del Norte", "Humboldt", "Lake", "Mendocino", "Napa", "Sonoma", "Trinity"),
+             `San Francisco Bay Area` = c("Alameda", "Contra Costa", "Marin", "San Francisco", 
+                                          "San Mateo", "Santa Clara", "Solano"),
+             `San Joaquin Valley` = c("Alpine", "Amador", "Calaveras", "Madera", "Mariposa", 
+                                      "Merced", "Mono", "San Joaquin", "Stanislaus", "Tuolumne"),
+             `Central Coast` = c("Monterey", "San Benito", "San Luis Obispo", "Santa Barbara", 
+                                 "Santa Cruz", "Ventura"),
+             `Southern San Joaquin Valley` = c("Fresno", "Inyo", "Kern", "Kings", "Tulare"),
+             `Inland Empire` = c("Riverside", "San Bernardino"),
+             `Los Angeles County` = "Los Angeles",
+             `Orange County` = "Orange",
+             `San Diego - Imperial` = c("Imperial", "San Diego")
+           ) |> 
+           as.character()
+  )
 ```
 
--   date (example must use functions from **lubridate**)
+-   date (example must use functions from **lubridate**) (Lab 5 (Edited to modify date using lubridate))
 
 ```{r}
 #| label: wd-4-date
+get_fit_now_check_in <- get_fit_now_check_in %>%
+  mutate(check_in_date = ymd(as.character(check_in_date)))
 
+filtered_check_ins <- get_fit_now_check_in %>%
+  filter(check_in_date == ymd("2018-01-09") & startsWith(membership_id, "48Z"))
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
 
--   `left_join() (Lab 4 Question 2)`
+-   `left_join()` (Lab 4 Question 2)
 
 ```{r}
 #| label: wd-5-left
 ca_childcare <- counties %>%
-  filter(state_abbreviation == "CA") %>%
-  left_join(childcare_costs, by = "county_fips_code")
+  filter(
+    state_abbreviation == "CA") %>%
+  left_join(
+    childcare_costs, 
+            by = "county_fips_code")
 ```
 
--   `right_join()`
+-   `right_join()`(Lab 4 Question 2 (Edited to use right_join()))
 
 ```{r}
 #| label: wd-5-right
-
+ca_childcare <- counties %>%
+  filter(
+    state_abbreviation == "CA") %>%
+  left_join(
+    childcare_costs, 
+            by = "county_fips_code")
 ```
 
 -   `inner_join() (Lab 5)`
@@ -175,30 +234,35 @@ ca_childcare <- counties %>%
 ```{r}
 #| label: wd-5-inner
 joined_data <- filtered_check_ins %>%
-  inner_join(get_fit_now_member, by = "membership_id")
-```
-
--   `full_join()`
-
-```{r}
-#| label: wd-5-full
-
+  inner_join(
+    get_fit_now_member, 
+    by = "membership_id")
 ```
 
 **WD-6: I can use filtering joins to filter rows from a dataframe.**
 
--   `semi_join()`
+-   `semi_join()` (Lab 4 Question 2 (Edited to use semi_join()))
 
 ```{r}
 #| label: wd-6-semi
-
+ca_childcare <- counties %>%
+  filter(
+    state_abbreviation == "CA") %>%
+  semi_join(
+    childcare_costs, 
+            by = "county_fips_code")
 ```
 
--   `anti_join()`
+-   `anti_join()` (Lab 4 Question 2 (Edited to use anti_join()))
 
 ```{r}
 #| label: wd-6-anti
-
+ca_childcare <- counties %>%
+  filter(
+    state_abbreviation == "CA") %>%
+  anti_join(
+    childcare_costs, 
+            by = "county_fips_code")
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -208,9 +272,23 @@ joined_data <- filtered_check_ins %>%
 ```{r}
 #| label: wd-7-long
 ca_childcare_long <- ca_childcare %>%
-  select(year = study_year, region, mc_infant, mc_toddler, mc_preschool) %>%
-  pivot_longer(cols = starts_with("mc_"), names_to = "age_group", values_to = "full_time_median") %>%
-  mutate(age_group = recode(age_group, mc_infant = "Infant", mc_toddler = "Toddler", mc_preschool = "Preschool"))
+  select(
+    year = study_year, 
+         region, 
+         mc_infant, 
+         mc_toddler, 
+         mc_preschool) %>%
+  pivot_longer(
+    cols = starts_with("mc_"), 
+    names_to = "age_group", 
+    values_to = "full_time_median") %>%
+  mutate(
+    age_group = 
+      recode(
+      age_group, 
+      mc_infant = "Infant", 
+      mc_toddler = "Toddler", 
+      mc_preschool = "Preschool"))
 ```
 
 -   `pivot_wider() (Lab 4 Question 4)`
@@ -218,10 +296,18 @@ ca_childcare_long <- ca_childcare %>%
 ```{r}
 #| label: wd-7-wide
 income_table <- ca_childcare %>%
-  group_by(region, study_year) %>%
-  summarize(median_income = median(mhi_2018, na.rm = TRUE) , .groups = "drop") %>%
-  filter(study_year %in% c(2008, 2018)) %>%
-  pivot_wider(names_from = study_year, values_from = median_income) %>%
+  group_by(
+    region, 
+    study_year) %>%
+  summarize(
+    median_income = 
+      median(mhi_2018, na.rm = TRUE) , 
+    .groups = "drop") %>%
+  filter(
+    study_year %in% c(2008, 2018)) %>%
+  pivot_wider(
+    names_from = study_year, 
+    values_from = median_income) %>%
   arrange(desc(`2018`))
 ```
 
@@ -229,7 +315,8 @@ income_table <- ca_childcare %>%
 
 **R-1: I can create professional looking, reproducible analyses using RStudio projects, Quarto documents, and the here package.**
 
-I've done this in the following provided assignments:
+I've done this in the following provided assignments: (Lab 9)
+
 
 **R-2: I can write well documented and tidy code.**
 
@@ -292,18 +379,34 @@ ggplot(ca_childcare_infant, aes(x = mhi_2018, y = mc_infant)) +
 
 **R-3: I can write robust programs that are resistant to changes in inputs.**
 
--   Example -- any context
+-   Example -- any context (Lab 8 Question 4)
 
 ```{r}
 #| label: r-3-example
+missing_values <- data.frame(
+  Variable = names(fish),
+  `Number of Missing Values` = map_int(fish, ~ sum(is.na(.)))
+)
 
+missing_values %>%
+  kable(col.names = c("Variable", 
+                      "Number of Missing Values"), 
+        caption = "Number of Missing Values for Each Variable in the Fish Dataset")
 ```
 
--   Example of function stops
+-   Example of function stops (Lab 7 Question 4)
 
 ```{r}
 #| label: r-3-function-stops
-
+rescale <- function(x) {
+  if (!is.numeric(x)) {
+    stop()
+  }
+  if (length(x) <= 1) {
+    stop()
+  }
+  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+}
 ```
 
 ## Data Visualization & Summarization
@@ -329,10 +432,31 @@ ggplot(ca_childcare_infant, aes(x = mhi_2018, y = mc_infant)) +
   theme_minimal()
 ```
 
--   at least one numeric variable and one categorical variable (Lab Challenge 3 Question 2)
+-   at least one numeric variable and one categorical variable (Lab 4 Question 6)
 
 ```{r}
 #| label: dvs-2-num-cat
+ggplot(ca_childcare_long, aes(x = year, y = full_time_median, color = region)) +
+  geom_point(size = .8, alpha = 0.6) +
+  geom_smooth(method = "loess", se = FALSE) +
+  facet_wrap(~ age_group) +
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
+  labs(
+    title = "Weekly Median Price for Center-Based Childcare($)",
+    x = "Study Year",
+    y = NULL,
+    color = "Region"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(size = 5)
+  )
+```
+
+-   at least two categorical variables (Lab Challenge 3 Question 2)
+
+```{r}
+#| label: dvs-2-cat
 ggplot(teacher_evals_compare, aes(x = sen_level, fill = SET_level)) +
   geom_bar(stat = "count", position = "stack") +
   labs(
@@ -343,18 +467,30 @@ ggplot(teacher_evals_compare, aes(x = sen_level, fill = SET_level)) +
   )
 ```
 
--   at least two categorical variables
-
-```{r}
-#| label: dvs-2-cat
-
-```
-
--   dates (timeseries plot)
+-   dates (timeseries plot) (Lab 4 Question 6)
 
 ```{r}
 #| label: dvs-2-date
+ca_childcare_long <- ca_childcare %>%
+  select(year = study_year, region, mc_infant, mc_toddler, mc_preschool) %>%
+  pivot_longer(cols = starts_with("mc_"), names_to = "age_group", values_to = "full_time_median") %>%
+  mutate(age_group = recode(age_group, mc_infant = "Infant", mc_toddler = "Toddler", mc_preschool = "Preschool"))
 
+ggplot(ca_childcare_long, aes(x = year, y = full_time_median, color = region)) +
+  geom_point(size = .8, alpha = 0.6) +
+  geom_smooth(method = "loess", se = FALSE) +
+  facet_wrap(~ age_group) +
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
+  labs(
+    title = "Weekly Median Price for Center-Based Childcare($)",
+    x = "Study Year",
+    y = NULL,
+    color = "Region"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(size = 5)
+  )
 ```
 
 **DVS-2: I use plot modifications to make my visualization clear to the reader.**
@@ -385,36 +521,10 @@ ggplot(surveys,
   theme(axis.text.x = element_text(angle = 45))
 ```
 
--   I can reorder my legend to align with the colors in my plot
+-   I can reorder my legend to align with the colors in my plot (Lab 4 Question 6)
 
 ```{r}
 #| label: dvs-2-3
-
-```
-
-**DVS-3: I show creativity in my visualizations**
-
--   I can use non-standard colors (Lab 2 Question 13 (Modified to make code more readable))
-
-```{r}
-#| label: dvs-3-1
-ggplot(surveys, 
-  aes(x = species, y = weight)) + 
-  geom_boxplot() + 
-  geom_jitter(color = "orange3", alpha = 0.2)
-```
-
--   I can use annotations
-
-```{r}
-#| label: dvs-3-2
-
-```
-
--   I can be creative... (Lab 4 Question 6)
-
-```{r}
-#| label: dvs-3-3
 ggplot(ca_childcare_long, aes(x = year, y = full_time_median, color = region)) +
   geom_point(size = .8, alpha = 0.6) +
   geom_smooth(method = "loess", se = FALSE) +
@@ -432,6 +542,68 @@ ggplot(ca_childcare_long, aes(x = year, y = full_time_median, color = region)) +
   )
 ```
 
+**DVS-3: I show creativity in my visualizations**
+
+-   I can use non-standard colors (Lab 4 Question 7 (Edited to use non-standard colors))
+
+```{r}
+#| label: dvs-3-1
+ca_childcare_infant <- ca_childcare %>%
+  select(mhi_2018, mc_infant) %>%
+  drop_na()
+
+ggplot(ca_childcare_infant, aes(x = mhi_2018, y = mc_infant)) +
+  geom_point(size = 2, alpha = 0.6, color = "#4DAF4A") + 
+  geom_smooth(method = "lm", se = FALSE, color = "#984EA3") +
+  labs(
+    title = "Median Household Income and Full-Time Median Weekly Price for Infant",
+    x = "Median Household Income (2018 dollars)",
+    y = "Median Weekly Price for Childcare (Infant)"
+  ) +
+  theme_minimal()
+```
+
+-   I can use annotations (Lab 9 Question 8)
+
+```{r}
+#| label: dvs-3-2
+all_simulations %>% 
+  ggplot(aes(x = simulated_means)) +
+  geom_histogram(binwidth = 0.5, 
+                 fill = "blue", 
+                 color = "black") +
+  facet_wrap(~ n, scales = "free_y", 
+             labeller = labeller(n = function(x) 
+               paste("Sample Size =", x))) +
+  geom_vline(xintercept = 10, 
+             linetype = "dashed", 
+             color = "red") +
+  labs(x = "Simulated Means", 
+       y = "Frequency", 
+       title = "Distribution of Simulated Means for Different Sample Sizes") +
+  theme_minimal()
+```
+```
+
+-   I can be creative... (Lab 4 Question 7 (Edited to use non-standard colors))
+
+```{r}
+#| label: dvs-3-3
+ca_childcare_infant <- ca_childcare %>%
+  select(mhi_2018, mc_infant) %>%
+  drop_na()
+
+ggplot(ca_childcare_infant, aes(x = mhi_2018, y = mc_infant)) +
+  geom_point(size = 2, alpha = 0.6, color = "#4DAF4A") + 
+  geom_smooth(method = "lm", se = FALSE, color = "#984EA3") +
+  labs(
+    title = "Median Household Income and Full-Time Median Weekly Price for Infant",
+    x = "Median Household Income (2018 dollars)",
+    y = "Median Weekly Price for Childcare (Infant)"
+  ) +
+  theme_minimal()
+```
+
 **DVS-4: I can calculate numerical summaries of variables.**
 
 -   Example using `summarize() (Lab 4 Question 4)`
@@ -440,34 +612,27 @@ ggplot(ca_childcare_long, aes(x = year, y = full_time_median, color = region)) +
 #| label: dvs-4-summarize
 income_table <- ca_childcare %>%
   group_by(region, study_year) %>%
-  summarize(median_income = median(mhi_2018, na.rm = TRUE) , .groups = "drop") %>%
+  summarize(median_income = 
+              median(mhi_2018, na.rm = TRUE) , 
+            .groups = "drop") %>%
   filter(study_year %in% c(2008, 2018)) %>%
-  pivot_wider(names_from = study_year, values_from = median_income) %>%
+  pivot_wider(names_from = 
+                study_year, 
+              values_from = median_income) %>%
   arrange(desc(`2018`))
 ```
 
--   Example using `across() (Lab 3 Question 5)`
+-   Example using `across()`(Lab 7 Question 1)
 
 ```{r}
 #| label: dvs-4-across
-teacher_evals_clean <- teacher_evals |>
-  rename(sex = gender) |>
-  filter(no_participants >= 10) |>
-  mutate(across(c(course_id, 
-                  question_no, 
-                  academic_degree, 
-                  seniority, 
-                  sex,), as.factor)) |>
-  select(course_id, 
-         teacher_id, 
-         question_no, 
-         no_participants, 
-         resp_share, 
-         SET_score_avg, 
-         percent_failed_cur, 
-         academic_degree, 
-         seniority, 
-         sex)
+missingfish <- fish %>%
+  summarize(
+    totalmissingfish = sum(rowSums(across(everything(), is.na)) > 0),
+    variablesmissingfish = names(fish)[colSums(across(everything(), is.na)) > 0]
+  )
+
+missingfish
 ```
 
 **DVS-5: I can find summaries of variables across multiple groups.**
@@ -483,16 +648,20 @@ summarize(
   )
 ```
 
--   Example 2 (Lab 3 Question 9)
+-   Example 2 (Lab 4 Question 4)
 
 ```{r}
 #| label: dvs-5-2
-question <- teacher_evals_clean |>
-  distinct(teacher_id, course_id, question_no) |>
-  count(teacher_id, course_id) |>
-  filter(n == 9) |>
-  summarize(total_combinations = n())
-question
+income_table <- ca_childcare %>%
+  group_by(region, study_year) %>%
+  summarize(median_income = 
+              median(mhi_2018, na.rm = TRUE) , 
+            .groups = "drop") %>%
+  filter(study_year %in% c(2008, 2018)) %>%
+  pivot_wider(names_from = 
+                study_year, 
+              values_from = median_income) %>%
+  arrange(desc(`2018`))
 ```
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
@@ -502,19 +671,41 @@ question
 ```{r}
 #| label: dvs-6-1
 income_table <- ca_childcare %>%
-  group_by(region, study_year) %>%
-  summarize(median_income = median(mhi_2018, na.rm = TRUE) , .groups = "drop") %>%
+  group_by(
+    region, 
+    study_year) %>%
+  summarize(median_income = 
+              median(mhi_2018, na.rm = TRUE) , 
+            .groups = "drop") %>%
   filter(study_year %in% c(2008, 2018)) %>%
-  pivot_wider(names_from = study_year, values_from = median_income) %>%
+  pivot_wider(names_from = study_year, 
+              values_from = median_income) %>%
   arrange(desc(`2018`))
 income_table
 ```
 
--   Example 2
+-   Example 2 (Lab 4 Question 6)
 
 ```{r}
 #| label: dvs-6-2
-
+ca_childcare_long <- ca_childcare %>%
+  select(
+    year = study_year, 
+         region, 
+         mc_infant, 
+         mc_toddler, 
+         mc_preschool) %>%
+  pivot_longer(
+    cols = starts_with("mc_"), 
+    names_to = "age_group", 
+    values_to = "full_time_median") %>%
+  mutate(
+    age_group = 
+      recode(
+      age_group, 
+      mc_infant = "Infant", 
+      mc_toddler = "Toddler", 
+      mc_preschool = "Preschool"))
 ```
 
 **DVS-7: I show creativity in my tables.**
@@ -532,11 +723,43 @@ income_table <- ca_childcare %>%
 income_table
 ```
 
--   Example 2
+-   Example 2 (Lab 9 Question 2)
 
 ```{r}
 #| label: dvs-7-2
+results_df <- enframe(results, 
+                      name = "simulation_number", 
+                      value = "ncorrect")
+enframe(results, 
+        name = "simulation_number", 
+        value = "ncorrect")
+proportions_table <- results_df %>%
+  count(ncorrect) %>%
+  mutate(proportion = n / sum(n)) %>%
+  pivot_wider(names_from = ncorrect, values_from = proportion, names_prefix = "babies_")
 
+proportions_table %>%
+  gt() %>%
+  tab_header(
+    title = "Proportion of Correct Baby Assignments",
+    subtitle = "Based on 10,000 Simulations"
+  ) %>%
+  fmt_percent(
+    columns = starts_with("babies_"),
+    decimals = 2
+  ) %>%
+  opt_table_lines() %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "lightblue"),
+      cell_text(weight = "bold")
+    ),
+    locations = cells_body(columns = everything())
+  ) %>%
+  tab_options(
+    table.font.size = px(14),
+    row.striping.include_table_body = TRUE
+  )
 ```
 
 ## Program Efficiency
@@ -557,7 +780,7 @@ teacher_evals_compare <- teacher_evals |>
          sen_level)
 ```
 
--   `across()``(Lab 3 Question 5)`
+-   ``` across()``(Lab 3 Question 5) ```
 
 ```{r}
 #| label: pe-1-across
@@ -581,69 +804,116 @@ teacher_evals_clean <- teacher_evals |>
          sex)
 ```
 
--   `map()` functions
+-   `map()` functions (Lab 8 Question 4)
 
 ```{r}
 #| label: pe-1-map-1
+missing_values <- data.frame(
+  Variable = names(fish),
+  `Number of Missing Values` = map_int(fish, ~ sum(is.na(.)))
+)
 
+missing_values %>%
+  kable(col.names = c("Variable", 
+                      "Number of Missing Values"), 
+        caption = "Number of Missing Values for Each Variable in the Fish Dataset")
 ```
 
 **PE-2: I can write functions to reduce repetition in my code.**
 
--   Function that operates on vectors
+-   Function that operates on vectors (Lab 7 Question 4)
 
 ```{r}
 #| label: pe-2-1
-
+rescale <- function(x) {
+  if (!is.numeric(x)) {
+    stop()
+  }
+  if (length(x) <= 1) {
+    stop()
+  }
+  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+}
 ```
 
--   Function that operates on data frames
+-   Function that operates on data frames (Lab 7 Question 8)
 
 ```{r}
 #| label: pe-2-2
-
+rescale_column <- function(data, vars) {
+  vars <- syms(vars)
+  for (var in vars) {
+    data <- data %>%
+      mutate(!!var := rescale(!!sym(var)))
+  }
+  data
+}
 ```
 
 **PE-3:I can use iteration to reduce repetition in my code.**
 
--   `across()`
+-   `across()` (Lab 7 Question 1)
 
 ```{r}
 #| label: pe-3-across
+missingfish <- fish %>%
+  summarize(
+    totalmissingfish = sum(rowSums(across(everything(), is.na)) > 0),
+    variablesmissingfish = names(fish)[colSums(across(everything(), is.na)) > 0]
+  )
 
+missingfish
 ```
 
--   `map()` function with **one** input (e.g., `map()`, `map_chr()`, `map_dbl()`, etc.)
+-   `map()` function with **one** input (e.g., `map()`, `map_chr()`, `map_dbl()`, etc.) (Lab 8 Question 4)
 
 ```{r}
 #| label: pe-3-map-1
+missing_values <- data.frame(
+  Variable = names(fish),
+  `Number of Missing Values` = map_int(fish, ~ sum(is.na(.)))
+)
 
+missing_values %>%
+  kable(col.names = c("Variable", 
+                      "Number of Missing Values"), 
+        caption = "Number of Missing Values for Each Variable in the Fish Dataset")
 ```
 
--   `map()` function with **more than one** input (e.g., `map_2()` or `pmap()`)
+-   `map()` function with **more than one** input (e.g., `map_2()` or `pmap()`) (Lab 9 Question 6)
 
 ```{r}
 #| label: pe-3-map-2
+all_simulations <- grid %>% 
+  mutate(simulated_means = pmap(.l = list(n, df), 
+                                .f = simulate_means)
+         ) %>% 
+  unnest(simulated_means)
 
 ```
 
 **PE-4: I can use modern tools when carrying out my analysis.**
 
--   I can use functions which are not superseded or deprecated (Lab Challenge 3 Question 1)
+-   I can use functions which are not superseded or deprecated (Lab 4 Question 4)
 
 ```{r}
 #| label: pe-4-1
-teacher_evals_compare <- teacher_evals |>
-  filter(question_no == 903) |>
-  mutate(
-    SET_level = if_else(SET_score_avg >= 4, "excellent", "standard"),
-    sen_level = if_else(seniority <= 4, "junior", "senior")) |>
-  select(course_id, 
-         SET_level, 
-         sen_level)
+income_table <- ca_childcare %>%
+  group_by(region, 
+  study_year) %>%
+  summarize(
+  median_income = median(mhi_2018, 
+  na.rm = TRUE) , 
+  .groups = "drop") %>%
+  filter(study_year %in% c(2008, 2018)) %>%
+  pivot_wider(
+  names_from = study_year, 
+  values_from = median_income) %>%
+  arrange(desc(`2018`))
+income_table
 ```
 
--   I can connect a data wrangling pipeline into a `ggplot() (Lab 4 Question 6)`
+-   I can connect a data wrangling pipeline into a `ggplot()` (Lab 4 Question 6)
 
 ```{r}
 #| label: pe-4-2
@@ -681,11 +951,11 @@ reg_mod1 <- lm(mc_infant ~ mhi_2018, data = ca_childcare_infant)
 summary(reg_mod1)
 ```
 
--   Example 2
+-   Example 2 (Challenge 3 Question 3)
 
 ```{r}
 #| label: dsm-1-2
-
+chisq.test(teacher_evals_compare$SET_level, teacher_evals_compare$sen_level)
 ```
 
 **DSSM-2: I can conduct common statistical analyses in R.**
@@ -711,7 +981,7 @@ chisq.test(teacher_evals_compare$SET_level, teacher_evals_compare$sen_level)
 
 <!-- For the revisions included in your Portfolio, to help me understand the nature of your revisions, please denote somehow the feedback I provided you (e.g., boldface, italics, colored text) before your revisions. -->
 
-Throughout the course, I have reflected on how I might revise my thinking and approach to coding based on potential feedback. From this, I have altered some of my code in the portfolio.
+Throughout the course, I have reflected on how I might revise my thinking and approach to coding based on potential feedback. From this, I have altered some of my code in the portfolio especially in writing tidier code.
 
 ## Extending My Thinking
 
